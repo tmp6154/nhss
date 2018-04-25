@@ -11,17 +11,26 @@ extern int fallthru;
 
 int moveKey(char dir) {
   switch (dir) {
+    case '\033': //Process escape sequence (arrows/numpad)
+      dir = interpret_escape(dir);
+      moveKey(dir);
+      break;
+
     case 'k':
+    case '8':
       moveto(0, 1);
       return E_SUCCESS;
     case 'j':
+    case '2':
       moveto(0, -1);
       return E_SUCCESS;
 
     case 'l':
+    case '6':
       moveto(1, 0);
       return E_SUCCESS;
     case 'h':
+    case '4':
       moveto(-1, 0);
       return E_SUCCESS;
 
@@ -29,22 +38,54 @@ int moveKey(char dir) {
 // You can't move diagonally around a boulder.
 // We'd need to add rules in moveto to disallow moves between diag adjacent boulders and walls to enable this and have it behave correctly.
     case 'b':
+    case '1':
       moveto(-1, -1);
       return E_SUCCESS;
     case 'y':
+    case '7':
       moveto(-1, 1);
       return E_SUCCESS;
 
     case 'n':
+    case '3':
       moveto(1, -1);
       return E_SUCCESS;
     case 'u':
+    case '9':
       moveto(1, 1);
       return E_SUCCESS;
 
-
     default:
       return E_ERROR;
+      break;
+  }
+}
+
+char interpret_escape() { //Translate arrows and numpad into vi-keys
+  if (getch() != '[') return '\0';
+  switch(getch()) {
+    case 'A': //Arrow keys/Numpad arrows
+      return 'k';
+    case 'B':
+      return 'j';
+    case 'C':
+      return 'l';
+    case 'D':
+      return 'h';
+
+    case 'H': //Numpad keys
+      return 'y';
+    case '5':
+      if (getch() != '~') return '\0';
+      return 'u';
+    case 'F':
+      return 'b';
+    case '6':
+      if (getch() != '~') return '\0';
+      return 'n';
+
+    default:
+      return '\0';
       break;
   }
 }

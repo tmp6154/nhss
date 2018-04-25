@@ -8,5 +8,6 @@
 //          b  j  n
 int moveKey(char dir);
 void moveto(int x, int y);
+char interpret_escape();
 
 #endif
