@@ -104,15 +104,22 @@ int isstairsdown() {
   return 0;
 }
 
+// Called when level is solved, prints status, cleans up and terminates
+int solved(const * char status) {
+  statusline(status);
+  refresh();
+  sleep(1);
+  endwin();
+  record_close();
+  exit(E_SUCCESS);
+}
+
 void moveto(int x, int y) {	// Moves the character to the position specified by the coordinates, relative to the player
   switch (RELPOS(x, y)) {
     case '*': // reached the prize of the Sokoban
-      statusline("You have reached the prize and completed the Sokoban branch!");
-      refresh();
-      sleep(1);
-      endwin();
-      record_close();
-      exit(E_SUCCESS);
+      solved("You have reached the prize and completed the Sokoban branch!");
+    case '<': // stairs up, we escape this level
+      solved("You have completed this Sokoban level!");
     case '^': // walking into pit
       if (!fallthru) break;
       POS = isstairsdown() ? '>' : '.';
@@ -121,13 +128,6 @@ void moveto(int x, int y) {	// Moves the character to the position specified by 
       POS = '@';
       statusline("You fall through the pit to the level below and return upstairs");
       break;
-    case '<': // stairs up, we escape this level
-      statusline("You have completed this Sokoban level!");
-      refresh();
-      sleep(1);
-      endwin();
-      record_close();
-      exit(E_SUCCESS);
     case '>': // stairs down
     case '.': // an empty space
       switch (isdiag(x, y)) {
